@@ -17,7 +17,7 @@ UDP udp;
 String[] data;
 PImage con;
 PImage uncon;
-float versionNum = 1.1;
+float versionNum = 1.2;
 
 void setup() {
   size(450,400);
@@ -388,18 +388,18 @@ void saveSettings() {
  //This callback handler deals with intercepting the 4 messages and forwarding the proper message
  void receive( byte[] data, String ip, int port ) { 
   
-  data = subset(data, 0, data.length-1);
+  data = subset(data, 0, data.length);
   String message = new String( data ); 
-  if(message.equals("MESSAGE1")){
+  if(message.equals("MESSAGE1\n")){
     println("This is Message 1");
     sendMessage1();  
-  } else if(message.equals("MESSAGE2")){
+  } else if(message.equals("MESSAGE2\n")){
     println("This is Message 2");
     sendMessage2();
-  } else if(message.equals("MESSAGE3")){
+  } else if(message.equals("MESSAGE3\n")){
     println("This is Message 3");
     sendMessage3();
-  } else if(message.equals("MESSAGE4")){
+  } else if(message.equals("MESSAGE4\n")){
     println("This is Message 4");
     sendMessage4();
   } else {
