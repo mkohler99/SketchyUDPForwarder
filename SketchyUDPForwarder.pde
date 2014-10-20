@@ -1,5 +1,4 @@
 import hypermedia.net.*;
-
 import processing.net.*;
 import controlP5.*;
 
@@ -21,45 +20,44 @@ float versionNum = 1.2;
 
 void setup() {
   size(450,400);
-  data = loadStrings("settings.txt");
-  startServer();
-  background(220); 
   cp5 = new ControlP5(this);
   con = loadImage("connect.png");
-  uncon = loadImage("unconnect.png");
+  uncon = loadImage("unconnect.png"); 
+  data = loadStrings("settings.txt");
   setupGUI();
+  startServer();
   initialConnect();
-
 }
 
 void draw() {
   background(92);
   if(c.active()) {
+    //We must be connected
     image(con,320,10,100,40);
   } else {
+    //We're Not Connected
     image(uncon,320,10,100,40);
-  }
- 
-  
+  }  
 }
 
+
+
+//////////////////FUNCTIONS FOR CONTROL P5 SETUP //////////////////////////////////////////
 void setupGUI() {
+   //Sets up the User Interface
    start_time=millis();
-   
    header = cp5.addTextlabel("label")
                     .setText("UDP Message Forwarder")
                     .setPosition(5,10)
                     .setColorValue(0xffffffff)
                     .setFont(loadFont("Prototype-20.vlw"))
-                    ;
-                    
+                    ;               
     controllabel = cp5.addTextlabel("controllabel")
                     .setText("Commands Sent To Device")
                     .setPosition(20,100)
                     .setColorValue(0xffffffff)
                     .setFont(loadFont("Prototype-12.vlw"))
-                    ;
-                    
+                    ;                 
     netlabel = cp5.addTextlabel("netlabel")
                     .setText("Remote Device Settings")
                     .setPosition(20,40)
@@ -72,13 +70,8 @@ void setupGUI() {
                     .setColorValue(0xffffffff)
                     .setFont(loadFont("Prototype-12.vlw"))
                     ;
-
-
-
-  // Create the Sliders for Controlling The Params
   int controlXPos = 50;
   int controlYPos = 120;
-  
   // Message Field 1
   cp5.addTextfield("Message1", controlXPos+0, controlYPos,90,20);
   Textfield Msg1 = ((Textfield)cp5.getController("Message1"));
@@ -89,9 +82,7 @@ void setupGUI() {
      .setSize(40,20)
      .activateBy(ControlP5.PRESSED);
      ;
-     
-     controlYPos += 40;
-     
+     controlYPos += 40;  
      cp5.addTextfield("Message2", controlXPos+0, controlYPos,90,20);
   Textfield Msg2 = ((Textfield)cp5.getController("Message2"));
   Msg2.setValue(data[6]);
@@ -100,10 +91,8 @@ void setupGUI() {
      .setPosition(controlXPos+100,controlYPos)
      .setSize(40,20)
      .activateBy(ControlP5.PRESSED);
-     ;
-     
-     controlYPos += 40;
-     
+     ; 
+     controlYPos += 40; 
      cp5.addTextfield("Message3", controlXPos+0, controlYPos,90,20);
   Textfield Msg3 = ((Textfield)cp5.getController("Message3"));
   Msg3.setValue(data[7]);
@@ -113,9 +102,7 @@ void setupGUI() {
      .setSize(40,20)
      .activateBy(ControlP5.PRESSED);
      ;
-     
      controlYPos += 40;
-     
      cp5.addTextfield("Message4", controlXPos+0, controlYPos,90,20);
   Textfield Msg4 = ((Textfield)cp5.getController("Message4"));
   Msg4.setValue(data[8]);
@@ -125,9 +112,6 @@ void setupGUI() {
      .setSize(40,20)
      .activateBy(ControlP5.PRESSED);
      ;
-  
-
-
   // create the IP Chooser
   int ipFieldYPos = 60;
   int ipFieldXPos = 50;
@@ -161,19 +145,13 @@ void setupGUI() {
      .setPosition(ipFieldXPos+315,ipFieldYPos)
      .setSize(55,20)
      .activateBy(ControlP5.PRESSED);
-     ;
-     
+     ;    
   cp5.addButton("Save")
      .setValue(0)
      .setPosition(390,375)
      .setSize(55,20)
      .activateBy(ControlP5.PRESSED);
      ;
-     
-     
-     
-     
-     lockControls();
      //Pretty Labels for IP Stuff
        dot1 = cp5.addTextlabel("dot1")
                     .setText(".")
@@ -196,23 +174,10 @@ void setupGUI() {
 }
 
 
-
+///////////////////CP5 Connection Event Handlers//////////////////////////////////
 public void Connect(int theValue) {
-  if(millis()-start_time<1000){return;} //Trap to prevent me from hitting the button on launch
-  Textfield ip1 = ((Textfield)cp5.getController("Octet 1"));
-  Textfield ip2 = ((Textfield)cp5.getController("Octet 2"));
-  Textfield ip3 = ((Textfield)cp5.getController("Octet 3"));
-  Textfield ip4 = ((Textfield)cp5.getController("Octet 4"));
-  Textfield port = ((Textfield)cp5.getController("Port"));
-  String theIP = ip1.getText()+'.'+ip2.getText()+'.'+ip3.getText()+'.'+ip4.getText();
-  int thePort = int(port.getText());
-  println("Attempting to Connect: "+theIP+ " Port: "+thePort);
-  connectToDevice(theIP,thePort);
-  if(c.active()) {
-    unlockControls();
-  } else {
-    lockControls();
-  }
+  if(millis()-start_time<1000){return;} //Trap to prevent CP5 from running the control at launch
+  initialConnect();
 }
 
 void initialConnect() {
@@ -223,73 +188,38 @@ void initialConnect() {
   Textfield port = ((Textfield)cp5.getController("Port"));
   String theIP = ip1.getText()+'.'+ip2.getText()+'.'+ip3.getText()+'.'+ip4.getText();
   int thePort = int(port.getText());
-  println("Attempting to Initially Connect: "+theIP+ " Port: "+thePort);
+  println("Attempting to Connect: "+theIP+ " Port: "+thePort);
   connectToDevice(theIP,thePort);
-  if(c.active()) {
-    unlockControls();
-  } else {
-    lockControls();
-  }
 }
 
 public void Disconnect(int theValue) {
-  if(millis()-start_time<1000){return;} //Trap to prevent me from hitting the button on launch
+  if(millis()-start_time<1000){return;} //Trap to prevent CP5 from running the control at launch
   disconnectFromDevice();
-  if(c.active()) {
-    unlockControls();
-  } else {
-    lockControls();
-  }
 }
 
 public void Save(int theValue) {
-  if(millis()-start_time<1000){return;} //Trap to prevent me from hitting the button on launch
+  if(millis()-start_time<1000){return;} //Trap to prevent CP5 from running the control at launch
   saveSettings();
 }
 
 //BUTTONS FOR TEST SENDING COMMANDS
 
 public void send1(int theValue) {
-  if(millis()-start_time<1000){return;} //Trap to prevent me from hitting the button on launch
+  if(millis()-start_time<1000){return;} //Trap to prevent CP5 from running the control at launch
     sendMessage1(); 
 }
 public void send2(int theValue) {
-  if(millis()-start_time<1000){return;} //Trap to prevent me from hitting the button on launch
+  if(millis()-start_time<1000){return;} //Trap to prevent CP5 from running the control at launch
     sendMessage2(); 
 }
 public void send3(int theValue) {
-  if(millis()-start_time<1000){return;} //Trap to prevent me from hitting the button on launch
+  if(millis()-start_time<1000){return;} //Trap to prevent CP5 from running the control at launch
     sendMessage3(); 
 }
 public void send4(int theValue) {
-  if(millis()-start_time<1000){return;} //Trap to prevent me from hitting the button on launch
+  if(millis()-start_time<1000){return;} //Trap to prevent CP5 from running the control at launch
     sendMessage4(); 
 }
-
-
-//METHOD FOR LOCKING OUT CONTROLS ETC
-
-void lockControls(){
-  /*
-  Numberbox nb1 = ((Numberbox)cp5.getController("Frequency"));
-  nb1.lock();
-  nb1.setColorLabel(0x88888888);
-  nb1.setColorValue(0x88888888);
-*/
-}
-
-void unlockControls(){
-  /*
-  Numberbox nb1 = ((Numberbox)cp5.getController("Frequency"));
-  nb1.unlock();
-  nb1.setColorLabel(0xffffffff);
-  nb1.setColorVakye(0xffffffff);
-*/
-  
-}
-
-
-
 
 ////////////////////PROCEDURES FOR COMMUNICATING WITH THE DEVICE////////////////////
 void connectToDevice(String theIP, int thePort) {
@@ -357,9 +287,7 @@ void sendMessage4() {
   }   
 }
 
-
-
-//PERSISTANCE STUFF
+//////////////////////PERSISTANCE SETTINGS/////////////////////////////////////////
 
 void saveSettings() {
   String[] data = new String[9];
@@ -377,14 +305,12 @@ void saveSettings() {
   
 
 
-/****** We need to run a UDP Service to collect incoming messages ******/
+/////////////////// UDP MESSAGE CONTROL/////////////////////////////////////////////
  void startServer() {
    udp = new UDP( this, 6000);
    udp.listen(true);
  }
- 
- 
- 
+
  //This callback handler deals with intercepting the 4 messages and forwarding the proper message
  void receive( byte[] data, String ip, int port ) { 
   
@@ -405,7 +331,6 @@ void saveSettings() {
   } else {
     println("I dont understand");
   }
-
 }
   
   
