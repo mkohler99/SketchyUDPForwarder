@@ -16,13 +16,14 @@ UDP udp;
 String[] data;
 PImage con;
 PImage uncon;
-float versionNum = 1.2;
+float versionNum = 1.3;
+int pannyDelay = 200;
 
 void setup() {
   size(450,400);
   cp5 = new ControlP5(this);
   con = loadImage("connect.png");
-  uncon = loadImage("unconnect.png"); 
+  uncon = loadImage("wait.png"); 
   data = loadStrings("settings.txt");
   setupGUI();
   startServer();
@@ -31,13 +32,7 @@ void setup() {
 
 void draw() {
   background(92);
-  if(c.active()) {
-    //We must be connected
-    image(con,320,10,100,40);
-  } else {
-    //We're Not Connected
-    image(uncon,320,10,100,40);
-  }  
+
 }
 
 
@@ -47,8 +42,8 @@ void setupGUI() {
    //Sets up the User Interface
    start_time=millis();
    header = cp5.addTextlabel("label")
-                    .setText("UDP Message Forwarder")
-                    .setPosition(5,10)
+                    .setText("PANASONIC\n UDP Message Forwarder")
+                    .setPosition(5,5)
                     .setColorValue(0xffffffff)
                     .setFont(loadFont("Prototype-20.vlw"))
                     ;               
@@ -60,7 +55,7 @@ void setupGUI() {
                     ;                 
     netlabel = cp5.addTextlabel("netlabel")
                     .setText("Remote Device Settings")
-                    .setPosition(20,40)
+                    .setPosition(20,45)
                     .setColorValue(0xffffffff)
                     .setFont(loadFont("Prototype-12.vlw"))
                     ;
@@ -190,6 +185,7 @@ void initialConnect() {
   int thePort = int(port.getText());
   println("Attempting to Connect: "+theIP+ " Port: "+thePort);
   connectToDevice(theIP,thePort);
+  c.stop();
 }
 
 public void Disconnect(int theValue) {
@@ -225,9 +221,6 @@ public void send4(int theValue) {
 void connectToDevice(String theIP, int thePort) {
   c = new Client(this, theIP, thePort);
   if(c.active()) {
-  c.write("Hello Device!");
-  c.write('\r');
-  c.write('\n');
   } else {
     println("Unable to connect to remote device!");
   }
@@ -240,51 +233,100 @@ void disconnectFromDevice() {
 
 // THESE FUNCTIONS SEND THE MESSAGES IF YOU ARE SAFELY CONNECTED, IF NOT CONNECTED IT WILL IGNORE THEM
 void sendMessage1() {
-  if(c.active()) {
+if(c.active()){
+  c.write("%1AVMT 31"+'\r');
+} else {
     println("Sending Message 1!");
+    Textfield ip1 = ((Textfield)cp5.getController("Octet 1"));
+  Textfield ip2 = ((Textfield)cp5.getController("Octet 2"));
+  Textfield ip3 = ((Textfield)cp5.getController("Octet 3"));
+  Textfield ip4 = ((Textfield)cp5.getController("Octet 4"));
+  Textfield port = ((Textfield)cp5.getController("Port"));
+  String theIP = ip1.getText()+'.'+ip2.getText()+'.'+ip3.getText()+'.'+ip4.getText();
+  int thePort = int(port.getText());
+  println("Attempting to Connect: "+theIP+ " Port: "+thePort);
+  connectToDevice(theIP,thePort);
     String msg = cp5.get(Textfield.class,"Message1").getText();
-    c.write(msg);
-    c.write('\r');
-    c.write('\n');
-  } else {
-    println("Unable to Send Message 1, Please connect!");
-  }   
+    delay(pannyDelay);
+    c.write(msg+'\r');
+}
+    delay(pannyDelay);
+    println("Closing Connection");
+    c.stop();
+
 }
 
 void sendMessage2() {
-  if(c.active()) {
+if(c.active()){
+  c.write("%1AVMT 30"+'\r');
+} else {
     println("Sending Message 2!");
+    Textfield ip1 = ((Textfield)cp5.getController("Octet 1"));
+  Textfield ip2 = ((Textfield)cp5.getController("Octet 2"));
+  Textfield ip3 = ((Textfield)cp5.getController("Octet 3"));
+  Textfield ip4 = ((Textfield)cp5.getController("Octet 4"));
+  Textfield port = ((Textfield)cp5.getController("Port"));
+  String theIP = ip1.getText()+'.'+ip2.getText()+'.'+ip3.getText()+'.'+ip4.getText();
+  int thePort = int(port.getText());
+  println("Attempting to Connect: "+theIP+ " Port: "+thePort);
+  connectToDevice(theIP,thePort);
     String msg = cp5.get(Textfield.class,"Message2").getText();
-    c.write(msg);
-    c.write('\r');
-    c.write('\n');
-  } else {
-    println("Unable to Send Message 2, Please connect!");
-  }   
+    delay(pannyDelay);
+    c.write(msg+'\r');
+}
+    delay(pannyDelay);
+    println("Closing Connection");
+    c.stop();
+
+ 
 }
 
 void sendMessage3() {
-  if(c.active()) {
+  if(c.active()){
+  c.write("%1AVMT 30"+'\r');
+} else {
     println("Sending Message 3!");
+    Textfield ip1 = ((Textfield)cp5.getController("Octet 1"));
+  Textfield ip2 = ((Textfield)cp5.getController("Octet 2"));
+  Textfield ip3 = ((Textfield)cp5.getController("Octet 3"));
+  Textfield ip4 = ((Textfield)cp5.getController("Octet 4"));
+  Textfield port = ((Textfield)cp5.getController("Port"));
+  String theIP = ip1.getText()+'.'+ip2.getText()+'.'+ip3.getText()+'.'+ip4.getText();
+  int thePort = int(port.getText());
+  println("Attempting to Connect: "+theIP+ " Port: "+thePort);
+  connectToDevice(theIP,thePort);
     String msg = cp5.get(Textfield.class,"Message3").getText();
-    c.write(msg);
-    c.write('\r');
-    c.write('\n');
-  } else {
-    println("Unable to Send Message 3, Please connect!");
-  }   
+    delay(pannyDelay);
+    c.write(msg+'\r');
+}
+    delay(pannyDelay);
+    println("Closing Connection");
+    c.stop();
+
 }
 
 void sendMessage4() {
-  if(c.active()) {
+  if(c.active()){
+  c.write("%1AVMT 30"+'\r');
+} else {
     println("Sending Message 4!");
+    Textfield ip1 = ((Textfield)cp5.getController("Octet 1"));
+  Textfield ip2 = ((Textfield)cp5.getController("Octet 2"));
+  Textfield ip3 = ((Textfield)cp5.getController("Octet 3"));
+  Textfield ip4 = ((Textfield)cp5.getController("Octet 4"));
+  Textfield port = ((Textfield)cp5.getController("Port"));
+  String theIP = ip1.getText()+'.'+ip2.getText()+'.'+ip3.getText()+'.'+ip4.getText();
+  int thePort = int(port.getText());
+  println("Attempting to Connect: "+theIP+ " Port: "+thePort);
+  connectToDevice(theIP,thePort);
     String msg = cp5.get(Textfield.class,"Message4").getText();
-    c.write(msg);
-    c.write('\r');
-    c.write('\n');
-  } else {
-    println("Unable to Send Message 4, Please connect!");
-  }   
+    delay(pannyDelay);
+    c.write(msg+'\r');
+}
+    delay(pannyDelay);
+    println("Closing Connection");
+    c.stop();
+
 }
 
 //////////////////////PERSISTANCE SETTINGS/////////////////////////////////////////
